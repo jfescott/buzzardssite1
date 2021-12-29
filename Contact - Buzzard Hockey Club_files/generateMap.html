@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<!-- saved from url=(0262)https://www.editmysite.com/ajax/apps/generateMap.php?map=google&elementid=398592897679791370&ineditor=0&control=3&width=auto&height=250px&overviewmap=0&scalecontrol=0&typecontrol=0&zoom=15&long=-72.4398673&lat=41.7858244&domain=www&point=1&align=1&reseller=false -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>.gm-control-active>img{box-sizing:content-box;display:none;left:50%;pointer-events:none;position:absolute;top:50%;transform:translate(-50%,-50%)}.gm-control-active>img:nth-child(1){display:block}.gm-control-active:hover>img:nth-child(1),.gm-control-active:active>img:nth-child(1){display:none}.gm-control-active:hover>img:nth-child(2),.gm-control-active:active>img:nth-child(3){display:block}
+</style><link type="text/css" rel="stylesheet" href="./css(2)"><link type="text/css" rel="stylesheet" href="./css(3)"><style>.gm-ui-hover-effect{opacity:.6}.gm-ui-hover-effect:hover{opacity:1}
+</style><style>.gm-style .gm-style-cc a,.gm-style .gm-style-cc button,.gm-style .gm-style-cc span,.gm-style .gm-style-mtc div{font-size:10px;box-sizing:border-box}
+</style><style>@media print {  .gm-style .gmnoprint, .gmnoprint {    display:none  }}@media screen {  .gm-style .gmnoscreen, .gmnoscreen {    display:none  }}</style><style>.gm-style-moc{background-color:rgba(0,0,0,0.45);pointer-events:none;text-align:center;transition:opacity ease-in-out}.gm-style-mot{color:white;font-family:Roboto,Arial,sans-serif;font-size:22px;margin:0;position:relative;top:50%;transform:translateY(-50%);-webkit-transform:translateY(-50%);-ms-transform:translateY(-50%)}
+</style><style>.gm-style img{max-width: none;}.gm-style {font: 400 11px Roboto, Arial, sans-serif; text-decoration: none;}</style>
+		<title>Google Maps Output</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		
+		<style>
+			html, body, #mapContainer {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+
+			#mapContainer {
+				width: 100%;
+				text-align: center;
+			}
+
+			a {
+				color: #06C;
+				text-decoration: none;
+			}
+
+			a:visited {
+				color: #06C;
+			}
+
+			.gm-style .gm-style-iw-c {
+				border-radius: 0 !important;
+			}
+
+			.gm-style-iw {
+				text-align: left;
+			}
+
+			.leaflet-popup-content-wrapper-left {
+				width: 50%;
+				display: inline-block;
+			}
+
+			.leaflet-popup-content-wrapper-left a {
+				text-decoration: underline;
+				color: #333;
+			}
+
+			.leaflet-popup-content-wrapper-right {
+				width: 50%;
+				text-align: right;
+				display: inline-block;
+				vertical-align: top;
+			}
+
+			.leaflet-popup-content-wrapper-right a {
+				text-decoration: underline;
+				color: #333;
+			}
+
+			.leaflet-popup-content-wrapper-right button {
+				border: none;
+				background: none;
+				text-decoration: underline;
+				color: #333;
+				cursor: pointer;
+			}
+		</style>
+		<script type="text/javascript" src="./js"></script>
+		<script type="text/javascript">
+			//<![CDATA[
+			const primaryColor = '000';
+			const primaryContrastColor = 'FFF';
+
+			// send a cross domain iframe mesage to the parent to resize the frame to this height
+			var resizeMessage = function(event) {
+				var imageHeight = document.getElementById('mapContainer').clientHeight;
+
+				window.parent.postMessage(
+					imageHeight,
+					'*'
+				);
+			};
+
+			function setMarkerIcon(point, svg) {
+				point.setIcon({
+					url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg),
+				});
+			}
+
+			function createMarkerSvg(isFilled = true) {
+				const pinColor = isFilled ? primaryColor : primaryContrastColor;
+				const pinBorderColor = primaryColor;
+				const pinCircleColor = primaryContrastColor;
+				const pinCircleBorderColor = isFilled ? primaryContrastColor : primaryColor;
+				return '<svg width="24" height="34" viewBox="0 0 24 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23 11.9403C23 13.3823 22.4408 15.3712 21.4847 17.6402C20.54 19.8822 19.2523 22.2959 17.8934 24.5521C16.5353 26.8069 15.118 28.8845 13.9233 30.4526C13.3252 31.2377 12.7912 31.8842 12.3547 32.3576C12.2246 32.4987 12.1062 32.6211 12 32.7251C11.8938 32.6211 11.7754 32.4987 11.6453 32.3576C11.2088 31.8842 10.6748 31.2377 10.0767 30.4526C8.88205 28.8845 7.46474 26.8069 6.10661 24.5521C4.74766 22.2959 3.45995 19.8822 2.51528 17.6402C1.5592 15.3712 1 13.3823 1 11.9403C1 5.90283 5.92016 1 12 1C18.0798 1 23 5.90283 23 11.9403Z" fill="#'+pinColor+'" stroke="#'+pinBorderColor+'" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#'+pinCircleColor+'" stroke="#'+pinCircleBorderColor+'" stroke-width="2"/></svg>';
+			}
+
+			function clickViewMoreLink(id) {
+				if (id) {
+					var url = (window.location != window.parent.location)
+							? document.referrer
+							: document.location.href;
+
+					var postData = {
+						view_more_info_click: id
+					}
+					window.parent.postMessage(JSON.stringify(postData), url);
+				}
+			}
+
+			function gLoad() {
+				var touchSupported = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch),
+						forceTouch = false;
+
+				var forceMapDrag = false;
+
+				var myLatLng = new google.maps.LatLng(41.7858244, -72.4398673);
+				var locations = null;
+				var mapOptions = {
+					scrollwheel: false,
+					center: myLatLng,
+					zoom: 15,
+					panControl: false, zoomControl: true, zoomControlOptions: { style: google.maps.ZoomControlStyle.SMALL },
+					scaleControl: false,
+					mapTypeControl: false,
+					streetViewControl: false,
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					draggable: false				};
+
+				if ((touchSupported || forceTouch) && !forceMapDrag) {
+					mapOptions.draggable = false;
+					mapOptions.panControl = false;
+					mapOptions.scrollwheel = false;
+					mapOptions.zoomControlOptions = {style: google.maps.ZoomControlStyle.SMALL};
+					mapOptions.zoomControl = true;
+				}
+
+				// Use pre-v3.22 controls until the element can be updated with options for the new controls
+				google.maps.controlStyle = 'azteca';
+
+				function renderMap(options) {
+					var map = new google.maps.Map(document.getElementById("map"), options);
+					var activeMarker;
+					var hoverMarkerIndex;
+					var hasMapPoint = true;
+					var activeMarkerId = null;
+					// reset zoom level to display all markers
+					var bounds = new google.maps.LatLngBounds();
+
+					// marker designs
+					const filledMarker = createMarkerSvg(true);
+					const strokedMarker = createMarkerSvg(false);
+
+					var markers = [];
+					var infowindow = new google.maps.InfoWindow();
+
+					var isMarkerFixedInCenter = false;
+
+					if (hasMapPoint) {
+						var point = new google.maps.Marker({
+							position: myLatLng,
+							map: map,
+							optimized: false
+						});
+						setMarkerIcon(point, filledMarker);
+					}
+
+					if (locations) {
+						for (let i = 0; i < locations.length; i++) {
+							const shop = locations[i];
+							if (shop.lat && shop.long) {
+								const marker = new google.maps.Marker({
+									id: shop.id,
+									position: new google.maps.LatLng(shop.lat, shop.long),
+									map: map,
+									animation: 4,
+									optimized: false,
+									zIndex: i
+								});
+								bounds.extend(marker.position);
+								setMarkerIcon(marker, strokedMarker);
+
+								google.maps.event.addListener(marker, 'click', (function (marker, i) {
+									return function () {
+										var infowindowContent =
+												'<div class="leaflet-popup-content-wrapper-left">' +
+												'<h3 class="firstHeading">' + shop.display_name + '</h3>' +
+												'<div id="bodyContent">' +
+												'<p>' + shop.address + '</p>';
+
+										if (shop.phone) {
+											infowindowContent += '<p><a href="tel:' + shop.phone + '">' + shop.phone + '</a></p>';
+										}
+
+										infowindowContent +=
+												'</div></div>' +
+												'<div class="leaflet-popup-content-wrapper-right"><p><button onclick="clickViewMoreLink(\'' + marker.id + '\')">View more info</button></p>' +
+												'</div>';
+
+										infowindow.setContent(infowindowContent);
+										infowindow.open(map, marker);
+
+										// check to see if activeMarker is set
+										// if so, set the icon back to the default
+										activeMarker && activeMarker.setIcon({
+											url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(strokedMarker),
+										});
+
+										activeMarker && activeMarker.setZIndex(i);
+
+										// set the icon for the clicked marker
+										marker.setIcon({
+											url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(filledMarker),
+										});
+
+										// clicked marker on top
+										marker.setZIndex(i + 999);
+
+										// update the value of activeMarker
+										activeMarker = marker;
+
+										// relay message of location id to website
+										var url = (window.location != window.parent.location)
+												? document.referrer
+												: document.location.href;
+										var postData = {
+											location_click_event: marker.id
+										}
+										window.parent.postMessage(JSON.stringify(postData), url);
+									};
+								})(marker, i));
+
+								markers.push(marker);
+
+								// Add hover state to marker
+								marker.addListener('mouseover', function () {
+									marker.setIcon({
+										url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(filledMarker),
+									});
+									marker.setZIndex(i + 1000);
+								});
+
+								// remove hover state if marker is not currently active
+								marker.addListener('mouseout', function () {
+									if (marker !== activeMarker) {
+										marker.setIcon({
+											url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(strokedMarker),
+										});
+										marker.setZIndex(i);
+									}
+								});
+							}
+						}
+
+						//now fit the map to the newly inclusive bounds
+						map.fitBounds(bounds);
+					}
+
+					
+					if (activeMarkerId) {
+						var index = markers.findIndex( x => x.id == activeMarkerId );
+						google.maps.event.trigger(markers[index], 'click');
+						activeMarkerId = null;
+					}
+
+					// Maps loaded hidden (like in an accordion) don't center property as their width is often detected as 0.
+					// Detect when the iFrame "resizes" and reset the center
+					google.maps.event.addDomListener(window, 'resize', function() {
+						google.maps.event.trigger(map, 'resize');
+						map.setCenter(myLatLng);
+						if (locations) {
+							map.fitBounds(bounds);
+						}
+					});
+					var SET_TIMEOUT_MS = 200;
+					if (isMarkerFixedInCenter) {
+						google.maps.event.addListener(map, 'center_changed', function() {
+							// 0.2 seconds after the center of the map has changed,
+							// set back the marker position.
+							window.setTimeout(function() {
+								var center = map.getCenter();
+								point.setPosition(center);
+							}, SET_TIMEOUT_MS);
+						});
+
+						google.maps.event.addListener(map, 'dragend', function(evt) {
+							// Wait for the center to be changed before saving the Lat/Lng
+							window.setTimeout(function() {
+								var url = (window.location != window.parent.location)
+									? document.referrer
+									: document.location.href;
+								var center = map.getCenter();
+								var postData = {
+									lat: center.lat(),
+									lng: center.lng(),
+									message: 'marker_position_update_398592897679791370'
+								}
+								window.parent.postMessage(JSON.stringify(postData), url);
+							}, SET_TIMEOUT_MS + 25);
+
+						});
+					}
+
+					map.addListener('click', function() {
+						var url = (window.location != window.parent.location)
+							? document.referrer
+							: document.location.href;
+						window.parent.postMessage('map_click_event_398592897679791370', url);
+					});
+
+					window.addEventListener('message', function({ data = {} }) {
+						if (data.event && data.data && locations) {
+							var eventType = data.event;
+							var activeLocationId = data.data;
+							var index = markers.findIndex( x => x.id == activeLocationId );
+
+							if (eventType === 'open:location') {
+								google.maps.event.trigger(markers[index], 'click');
+								map.fitBounds(bounds);
+							}
+
+							if (eventType === 'hover:location') {
+								if (hoverMarkerIndex) {
+									google.maps.event.trigger(markers[hoverMarkerIndex], 'mouseout');
+								}
+								google.maps.event.trigger(markers[index], 'mouseover');
+								hoverMarkerIndex = index;
+								map.fitBounds(bounds);
+							}
+						}
+					});
+				};
+
+				var mapZoomScale = 0;
+				if (mapZoomScale > 0) {
+					var maxZoomService = new google.maps.MaxZoomService();
+					maxZoomService.getMaxZoomAtLatLng({
+						lat: parseFloat(41.7858244),
+						lng: parseFloat(-72.4398673),
+					}, function (response)  {
+						const success = response.status === 'OK';
+						var maxZoomLevel = success ? response.zoom : 18;
+						var zoomLevel = Math.round(maxZoomLevel * (mapZoomScale / 100));
+						zoomLevel = zoomLevel < 1 ? mapOptions.zoom : zoomLevel;
+						mapOptions.zoom = zoomLevel;
+						renderMap(mapOptions);
+					});
+				} else {
+					renderMap(mapOptions);
+				}
+			}
+
+			//]]>
+		</script>
+
+	<script type="text/javascript" charset="UTF-8" src="./common.js"></script><script type="text/javascript" charset="UTF-8" src="./util.js"></script><script type="text/javascript" charset="UTF-8" src="./map.js"></script><script type="text/javascript" charset="UTF-8" src="./marker.js"></script><script type="text/javascript" charset="UTF-8" src="./onion.js"></script><script type="text/javascript" charset="UTF-8" src="./ViewportInfoService.GetViewportInfo"></script><script type="text/javascript" charset="UTF-8" src="./AuthenticationService.Authenticate"></script><script type="text/javascript" charset="UTF-8" src="./vt"></script><script type="text/javascript" charset="UTF-8" src="./infowindow.js"></script><script type="text/javascript" charset="UTF-8" src="./QuotaService.RecordEvent"></script><script type="text/javascript" charset="UTF-8" src="./controls.js"></script></head>
+	<body onload="gLoad();" style="margin: 0; padding: 0;">
+
+	<div id="mapContainer">
+		<div id="map" style="height: 250px; max-width: 100%; position: relative; overflow: hidden;"><div style="height: 100%; width: 100%; position: absolute; top: 0px; left: 0px; background-color: rgb(229, 227, 223);"><div class="gm-style" style="position: absolute; z-index: 0; left: 0px; top: 0px; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px;"><div><button draggable="false" aria-label="Keyboard shortcuts" title="Keyboard shortcuts" type="button" style="background: none transparent; display: block; border: none; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: absolute; cursor: pointer; user-select: none; z-index: 1000002; left: -100000px; top: -100000px;"></button></div><div tabindex="0" aria-label="Map" aria-roledescription="map" role="group" style="position: absolute; z-index: 0; left: 0px; top: 0px; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; cursor: default; touch-action: pan-x pan-y;"><div style="z-index: 1; position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(0px, 0px);"><div style="position: absolute; left: 0px; top: 0px; z-index: 100; width: 100%;"><div style="position: absolute; left: 0px; top: 0px; z-index: 0;"><div style="position: absolute; z-index: 985; transform: matrix(1, 0, 0, 1, -93, -59);"><div style="position: absolute; left: 0px; top: 0px; width: 256px; height: 256px;"><div style="width: 256px; height: 256px;"></div></div><div style="position: absolute; left: -256px; top: 0px; width: 256px; height: 256px;"><div style="width: 256px; height: 256px;"></div></div><div style="position: absolute; left: -256px; top: -256px; width: 256px; height: 256px;"><div style="width: 256px; height: 256px;"></div></div><div style="position: absolute; left: 0px; top: -256px; width: 256px; height: 256px;"><div style="width: 256px; height: 256px;"></div></div><div style="position: absolute; left: 256px; top: -256px; width: 256px; height: 256px;"><div style="width: 256px; height: 256px;"></div></div><div style="position: absolute; left: 256px; top: 0px; width: 256px; height: 256px;"><div style="width: 256px; height: 256px;"></div></div></div></div></div><div style="position: absolute; left: 0px; top: 0px; z-index: 101; width: 100%;"></div><div style="position: absolute; left: 0px; top: 0px; z-index: 102; width: 100%;"></div><div style="position: absolute; left: 0px; top: 0px; z-index: 103; width: 100%;"><div style="position: absolute; left: 0px; top: 0px; z-index: -1;"><div style="position: absolute; z-index: 985; transform: matrix(1, 0, 0, 1, -93, -59);"><div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: 0px; top: 0px;"></div><div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: -256px; top: 0px;"></div><div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: -256px; top: -256px;"></div><div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: 0px; top: -256px;"></div><div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: 256px; top: -256px;"></div><div style="width: 256px; height: 256px; overflow: hidden; position: absolute; left: 256px; top: 0px;"></div></div></div><div style="width: 24px; height: 34px; overflow: hidden; position: absolute; left: -12px; top: -34px; z-index: 0;"><img alt="" src="data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%2224%22%20height%3D%2234%22%20viewBox%3D%220%200%2024%2034%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M23%2011.9403C23%2013.3823%2022.4408%2015.3712%2021.4847%2017.6402C20.54%2019.8822%2019.2523%2022.2959%2017.8934%2024.5521C16.5353%2026.8069%2015.118%2028.8845%2013.9233%2030.4526C13.3252%2031.2377%2012.7912%2031.8842%2012.3547%2032.3576C12.2246%2032.4987%2012.1062%2032.6211%2012%2032.7251C11.8938%2032.6211%2011.7754%2032.4987%2011.6453%2032.3576C11.2088%2031.8842%2010.6748%2031.2377%2010.0767%2030.4526C8.88205%2028.8845%207.46474%2026.8069%206.10661%2024.5521C4.74766%2022.2959%203.45995%2019.8822%202.51528%2017.6402C1.5592%2015.3712%201%2013.3823%201%2011.9403C1%205.90283%205.92016%201%2012%201C18.0798%201%2023%205.90283%2023%2011.9403Z%22%20fill%3D%22%23000%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%226%22%20fill%3D%22%23FFF%22%20stroke%3D%22%23FFF%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E" draggable="false" style="position: absolute; left: 0px; top: 0px; user-select: none; width: 24px; height: 34px; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div></div><div style="position: absolute; left: 0px; top: 0px; z-index: 0;"><div style="position: absolute; z-index: 985; transform: matrix(1, 0, 0, 1, -93, -59);"><div style="position: absolute; left: 0px; top: 0px; width: 256px; height: 256px; transition: opacity 200ms linear 0s;"><img draggable="false" alt="" role="presentation" src="./vt(1)" style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div><div style="position: absolute; left: -256px; top: 0px; width: 256px; height: 256px; transition: opacity 200ms linear 0s;"><img draggable="false" alt="" role="presentation" src="./vt(2)" style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div><div style="position: absolute; left: -256px; top: -256px; width: 256px; height: 256px; transition: opacity 200ms linear 0s;"><img draggable="false" alt="" role="presentation" src="./vt(3)" style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div><div style="position: absolute; left: 0px; top: -256px; width: 256px; height: 256px; transition: opacity 200ms linear 0s;"><img draggable="false" alt="" role="presentation" src="./vt(4)" style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div><div style="position: absolute; left: 256px; top: -256px; width: 256px; height: 256px; transition: opacity 200ms linear 0s;"><img draggable="false" alt="" role="presentation" src="./vt(5)" style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div><div style="position: absolute; left: 256px; top: 0px; width: 256px; height: 256px; transition: opacity 200ms linear 0s;"><img draggable="false" alt="" role="presentation" src="./vt(6)" style="width: 256px; height: 256px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div></div></div></div><div style="z-index: 3; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; touch-action: pan-x pan-y;"><div style="z-index: 4; position: absolute; left: 50%; top: 50%; width: 100%; transform: translate(0px, 0px);"><div style="position: absolute; left: 0px; top: 0px; z-index: 104; width: 100%;"></div><div style="position: absolute; left: 0px; top: 0px; z-index: 105; width: 100%;"></div><div style="position: absolute; left: 0px; top: 0px; z-index: 106; width: 100%;"><div title="" tabindex="-1" style="width: 24px; height: 34px; overflow: hidden; position: absolute; cursor: pointer; touch-action: none; left: -12px; top: -34px; z-index: 0;"><img alt="" src="./transparent.png" draggable="false" style="width: 24px; height: 34px; user-select: none; border: 0px; padding: 0px; margin: 0px; max-width: none;"></div></div><div style="position: absolute; left: 0px; top: 0px; z-index: 107; width: 100%;"></div></div></div><div class="gm-style-moc" style="z-index: 4; position: absolute; height: 100%; width: 100%; padding: 0px; border-width: 0px; margin: 0px; left: 0px; top: 0px; opacity: 0;"><p class="gm-style-mot"></p></div></div><iframe aria-hidden="true" frameborder="0" tabindex="-1" style="z-index: -1; position: absolute; width: 100%; height: 100%; top: 0px; left: 0px; border: none;" src="./saved_resource(1).html"></iframe><div style="pointer-events: none; width: 100%; height: 100%; box-sizing: border-box; position: absolute; z-index: 1000002; opacity: 0; border: 2px solid rgb(26, 115, 232);"></div><div></div><div></div><div></div><div></div><div><button draggable="false" aria-label="Toggle fullscreen view" title="Toggle fullscreen view" type="button" style="background: none rgb(255, 255, 255); display: none; border: 0px; margin: 10px; padding: 0px; text-transform: none; appearance: none; position: absolute; cursor: pointer; user-select: none; top: 0px; right: 0px;"></button></div><div></div><div></div><div></div><div></div><div><div class="gmnoprint gm-bundled-control gm-bundled-control-on-bottom" draggable="false" controlwidth="40" controlheight="81" style="margin: 10px; user-select: none; position: absolute; bottom: 95px; right: 40px;"><div class="gmnoprint" controlwidth="40" controlheight="40" style="display: none; position: absolute;"><div style="background-color: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; border-radius: 2px; width: 40px; height: 40px;"><button draggable="false" aria-label="Rotate map clockwise" title="Rotate map clockwise" type="button" class="gm-control-active" style="background: none; display: none; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; left: 0px; top: 0px; overflow: hidden; width: 40px; height: 40px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M0%200h24v24H0V0z%22/%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M12.06%209.06l4-4-4-4-1.41%201.41%201.59%201.59h-.18c-2.3%200-4.6.88-6.35%202.64-3.52%203.51-3.52%209.21%200%2012.72%201.5%201.5%203.4%202.36%205.36%202.58v-2.02c-1.44-.21-2.84-.86-3.95-1.97-2.73-2.73-2.73-7.17%200-9.9%201.37-1.37%203.16-2.05%204.95-2.05h.17l-1.59%201.59%201.41%201.41zm8.94%203c-.19-1.74-.88-3.32-1.91-4.61l-1.43%201.43c.69.92%201.15%202%201.32%203.18H21zm-7.94%207.92V22c1.74-.19%203.32-.88%204.61-1.91l-1.43-1.43c-.91.68-2%201.15-3.18%201.32zm4.6-2.74l1.43%201.43c1.04-1.29%201.72-2.88%201.91-4.61h-2.02c-.17%201.18-.64%202.27-1.32%203.18z%22/%3E%3C/svg%3E" style="width: 20px; height: 20px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M0%200h24v24H0V0z%22/%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M12.06%209.06l4-4-4-4-1.41%201.41%201.59%201.59h-.18c-2.3%200-4.6.88-6.35%202.64-3.52%203.51-3.52%209.21%200%2012.72%201.5%201.5%203.4%202.36%205.36%202.58v-2.02c-1.44-.21-2.84-.86-3.95-1.97-2.73-2.73-2.73-7.17%200-9.9%201.37-1.37%203.16-2.05%204.95-2.05h.17l-1.59%201.59%201.41%201.41zm8.94%203c-.19-1.74-.88-3.32-1.91-4.61l-1.43%201.43c.69.92%201.15%202%201.32%203.18H21zm-7.94%207.92V22c1.74-.19%203.32-.88%204.61-1.91l-1.43-1.43c-.91.68-2%201.15-3.18%201.32zm4.6-2.74l1.43%201.43c1.04-1.29%201.72-2.88%201.91-4.61h-2.02c-.17%201.18-.64%202.27-1.32%203.18z%22/%3E%3C/svg%3E" style="width: 20px; height: 20px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M0%200h24v24H0V0z%22/%3E%3Cpath%20fill%3D%22%23111%22%20d%3D%22M12.06%209.06l4-4-4-4-1.41%201.41%201.59%201.59h-.18c-2.3%200-4.6.88-6.35%202.64-3.52%203.51-3.52%209.21%200%2012.72%201.5%201.5%203.4%202.36%205.36%202.58v-2.02c-1.44-.21-2.84-.86-3.95-1.97-2.73-2.73-2.73-7.17%200-9.9%201.37-1.37%203.16-2.05%204.95-2.05h.17l-1.59%201.59%201.41%201.41zm8.94%203c-.19-1.74-.88-3.32-1.91-4.61l-1.43%201.43c.69.92%201.15%202%201.32%203.18H21zm-7.94%207.92V22c1.74-.19%203.32-.88%204.61-1.91l-1.43-1.43c-.91.68-2%201.15-3.18%201.32zm4.6-2.74l1.43%201.43c1.04-1.29%201.72-2.88%201.91-4.61h-2.02c-.17%201.18-.64%202.27-1.32%203.18z%22/%3E%3C/svg%3E" style="width: 20px; height: 20px;"></button><div style="position: relative; overflow: hidden; width: 30px; height: 1px; margin: 0px 5px; background-color: rgb(230, 230, 230); display: none;"></div><button draggable="false" aria-label="Rotate map counterclockwise" title="Rotate map counterclockwise" type="button" class="gm-control-active" style="background: none; display: none; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; left: 0px; top: 0px; overflow: hidden; width: 40px; height: 40px; transform: scaleX(-1);"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M0%200h24v24H0V0z%22/%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M12.06%209.06l4-4-4-4-1.41%201.41%201.59%201.59h-.18c-2.3%200-4.6.88-6.35%202.64-3.52%203.51-3.52%209.21%200%2012.72%201.5%201.5%203.4%202.36%205.36%202.58v-2.02c-1.44-.21-2.84-.86-3.95-1.97-2.73-2.73-2.73-7.17%200-9.9%201.37-1.37%203.16-2.05%204.95-2.05h.17l-1.59%201.59%201.41%201.41zm8.94%203c-.19-1.74-.88-3.32-1.91-4.61l-1.43%201.43c.69.92%201.15%202%201.32%203.18H21zm-7.94%207.92V22c1.74-.19%203.32-.88%204.61-1.91l-1.43-1.43c-.91.68-2%201.15-3.18%201.32zm4.6-2.74l1.43%201.43c1.04-1.29%201.72-2.88%201.91-4.61h-2.02c-.17%201.18-.64%202.27-1.32%203.18z%22/%3E%3C/svg%3E" style="width: 20px; height: 20px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M0%200h24v24H0V0z%22/%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M12.06%209.06l4-4-4-4-1.41%201.41%201.59%201.59h-.18c-2.3%200-4.6.88-6.35%202.64-3.52%203.51-3.52%209.21%200%2012.72%201.5%201.5%203.4%202.36%205.36%202.58v-2.02c-1.44-.21-2.84-.86-3.95-1.97-2.73-2.73-2.73-7.17%200-9.9%201.37-1.37%203.16-2.05%204.95-2.05h.17l-1.59%201.59%201.41%201.41zm8.94%203c-.19-1.74-.88-3.32-1.91-4.61l-1.43%201.43c.69.92%201.15%202%201.32%203.18H21zm-7.94%207.92V22c1.74-.19%203.32-.88%204.61-1.91l-1.43-1.43c-.91.68-2%201.15-3.18%201.32zm4.6-2.74l1.43%201.43c1.04-1.29%201.72-2.88%201.91-4.61h-2.02c-.17%201.18-.64%202.27-1.32%203.18z%22/%3E%3C/svg%3E" style="width: 20px; height: 20px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M0%200h24v24H0V0z%22/%3E%3Cpath%20fill%3D%22%23111%22%20d%3D%22M12.06%209.06l4-4-4-4-1.41%201.41%201.59%201.59h-.18c-2.3%200-4.6.88-6.35%202.64-3.52%203.51-3.52%209.21%200%2012.72%201.5%201.5%203.4%202.36%205.36%202.58v-2.02c-1.44-.21-2.84-.86-3.95-1.97-2.73-2.73-2.73-7.17%200-9.9%201.37-1.37%203.16-2.05%204.95-2.05h.17l-1.59%201.59%201.41%201.41zm8.94%203c-.19-1.74-.88-3.32-1.91-4.61l-1.43%201.43c.69.92%201.15%202%201.32%203.18H21zm-7.94%207.92V22c1.74-.19%203.32-.88%204.61-1.91l-1.43-1.43c-.91.68-2%201.15-3.18%201.32zm4.6-2.74l1.43%201.43c1.04-1.29%201.72-2.88%201.91-4.61h-2.02c-.17%201.18-.64%202.27-1.32%203.18z%22/%3E%3C/svg%3E" style="width: 20px; height: 20px;"></button><div style="position: relative; overflow: hidden; width: 30px; height: 1px; margin: 0px 5px; background-color: rgb(230, 230, 230); display: none;"></div><button draggable="false" aria-label="Tilt map" title="Tilt map" type="button" class="gm-tilt gm-control-active" style="background: none; display: block; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; top: 0px; left: 0px; overflow: hidden; width: 40px; height: 40px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2016%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M0%2016h8V9H0v7zm10%200h8V9h-8v7zM0%207h8V0H0v7zm10-7v7h8V0h-8z%22/%3E%3C/svg%3E" style="width: 18px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2016%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M0%2016h8V9H0v7zm10%200h8V9h-8v7zM0%207h8V0H0v7zm10-7v7h8V0h-8z%22/%3E%3C/svg%3E" style="width: 18px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2016%22%3E%3Cpath%20fill%3D%22%23111%22%20d%3D%22M0%2016h8V9H0v7zm10%200h8V9h-8v7zM0%207h8V0H0v7zm10-7v7h8V0h-8z%22/%3E%3C/svg%3E" style="width: 18px;"></button></div></div><div class="gmnoprint" controlwidth="40" controlheight="81" style="position: absolute; left: 0px; top: 0px;"><div draggable="false" style="user-select: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; border-radius: 2px; cursor: pointer; background-color: rgb(255, 255, 255); width: 40px; height: 81px;"><button draggable="false" aria-label="Zoom in" title="Zoom in" type="button" class="gm-control-active" style="background: none; display: block; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; overflow: hidden; width: 40px; height: 40px; top: 0px; left: 0px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2018%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M18%207h-7V0H7v7H0v4h7v7h4v-7h7z%22/%3E%3C/svg%3E" alt="" style="height: 18px; width: 18px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2018%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M18%207h-7V0H7v7H0v4h7v7h4v-7h7z%22/%3E%3C/svg%3E" alt="" style="height: 18px; width: 18px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2018%22%3E%3Cpath%20fill%3D%22%23111%22%20d%3D%22M18%207h-7V0H7v7H0v4h7v7h4v-7h7z%22/%3E%3C/svg%3E" alt="" style="height: 18px; width: 18px;"></button><div style="position: relative; overflow: hidden; width: 30px; height: 1px; margin: 0px 5px; background-color: rgb(230, 230, 230); top: 0px;"></div><button draggable="false" aria-label="Zoom out" title="Zoom out" type="button" class="gm-control-active" style="background: none; display: block; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; overflow: hidden; width: 40px; height: 40px; top: 0px; left: 0px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2018%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M0%207h18v4H0V7z%22/%3E%3C/svg%3E" alt="" style="height: 18px; width: 18px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2018%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M0%207h18v4H0V7z%22/%3E%3C/svg%3E" alt="" style="height: 18px; width: 18px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2018%2018%22%3E%3Cpath%20fill%3D%22%23111%22%20d%3D%22M0%207h18v4H0V7z%22/%3E%3C/svg%3E" alt="" style="height: 18px; width: 18px;"></button></div></div></div></div><div><div style="margin-left: 5px; margin-right: 5px; z-index: 1000000; position: absolute; left: 0px; bottom: 0px;"><a target="_blank" rel="noopener" href="https://maps.google.com/maps?ll=41.785824,-72.439867&amp;z=15&amp;t=m&amp;hl=en-US&amp;gl=US&amp;mapclient=apiv3" title="Open this area in Google Maps (opens a new window)" style="position: static; overflow: visible; float: none; display: inline;"><div style="width: 66px; height: 26px; cursor: pointer;"><img alt="" src="./google4_hdpi.png" draggable="false" style="position: absolute; left: 0px; top: 0px; width: 66px; height: 26px; user-select: none; border: 0px; padding: 0px; margin: 0px;"></div></a></div></div><div></div><div><div class="gmnoprint" style="z-index: 1000001; position: absolute; right: 253px; bottom: 0px;"><div draggable="false" class="gm-style-cc" style="user-select: none; height: 14px; line-height: 14px;"><div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;"><div style="width: 1px;"></div><div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div></div><div style="position: relative; padding-right: 6px; padding-left: 6px; box-sizing: border-box; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(0, 0, 0); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;"><button draggable="false" aria-label="Keyboard shortcuts" title="Keyboard shortcuts" type="button" style="background: none; display: inline-block; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; color: rgb(0, 0, 0); font-family: inherit; line-height: normal;">Keyboard shortcuts</button></div></div></div><div class="gmnoprint" style="z-index: 1000001; position: absolute; right: 166px; bottom: 0px; width: 87px;"><div draggable="false" class="gm-style-cc" style="user-select: none; height: 14px; line-height: 14px;"><div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;"><div style="width: 1px;"></div><div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div></div><div style="position: relative; padding-right: 6px; padding-left: 6px; box-sizing: border-box; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(0, 0, 0); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;"><button draggable="false" aria-label="Map Data" title="Map Data" type="button" style="background: none; display: none; border: 0px; margin: 0px; padding: 0px; text-transform: none; appearance: none; position: relative; cursor: pointer; user-select: none; color: rgb(0, 0, 0); font-family: inherit; line-height: normal;">Map Data</button><span>Map data ©2021</span></div></div></div><div class="gmnoprint gm-style-cc" draggable="false" style="z-index: 1000001; user-select: none; height: 14px; line-height: 14px; position: absolute; right: 95px; bottom: 0px;"><div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;"><div style="width: 1px;"></div><div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div></div><div style="position: relative; padding-right: 6px; padding-left: 6px; box-sizing: border-box; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(0, 0, 0); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;"><a href="https://www.google.com/intl/en-US_US/help/terms_maps.html" target="_blank" rel="noopener" style="text-decoration: none; cursor: pointer; color: rgb(0, 0, 0);">Terms of Use</a></div></div><div draggable="false" class="gm-style-cc" style="user-select: none; height: 14px; line-height: 14px; position: absolute; right: 0px; bottom: 0px;"><div style="opacity: 0.7; width: 100%; height: 100%; position: absolute;"><div style="width: 1px;"></div><div style="background-color: rgb(245, 245, 245); width: auto; height: 100%; margin-left: 1px;"></div></div><div style="position: relative; padding-right: 6px; padding-left: 6px; box-sizing: border-box; font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(0, 0, 0); white-space: nowrap; direction: ltr; text-align: right; vertical-align: middle; display: inline-block;"><a target="_blank" rel="noopener" title="Report errors in the road map or imagery to Google" dir="ltr" href="https://www.google.com/maps/@41.7858244,-72.4398673,15z/data=!10m1!1e1!12b1?source=apiv3&amp;rapsrc=apiv3" style="font-family: Roboto, Arial, sans-serif; font-size: 10px; color: rgb(0, 0, 0); text-decoration: none; position: relative;">Report a map error</a></div></div><div class="gmnoscreen" style="position: absolute; right: 0px; bottom: 0px;"><div style="font-family: Roboto, Arial, sans-serif; font-size: 11px; color: rgb(0, 0, 0); direction: ltr; text-align: right; background-color: rgb(245, 245, 245);">Map data ©2021</div></div></div></div></div></div>
+	</div>
+
+	
+	
+	</body></html>
